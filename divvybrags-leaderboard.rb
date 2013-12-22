@@ -18,13 +18,6 @@ end
 
 post '/new_entry' do
   new_post = LeaderboardPost.new
-  new_post.name = "Alex"
-  new_post.miles = 400
-  new_post.save
-end
-
-post '/new_entry' do
-  new_post = LeaderboardPost.new
   # check first to see if the name is already in the database. if so, update miles.
   new_post.name = params[:name]
   new_post.miles = params[:miles]
