@@ -23,7 +23,7 @@ LeaderboardPost.create(
 
 get "/entries.json" do
   content_type :json
-  { 1 : LeaderboardPost.get(1).name }.to_json
+  { "1" : LeaderboardPost.get(1).name }.to_json
 end
 
 post '/new_entry' do
