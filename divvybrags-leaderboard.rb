@@ -4,7 +4,7 @@ require "data_mapper"
 require "pg"
 require "dm-postgres-adapter"
 
-DataMapper.setup(:default, ENV['DATABASE_URL'] || 'postgres://localhost/leaderboard')
+DataMapper.setup(:default, ENV['HEROKU_POSTGRESQL_TEAL_URL'] || 'postgres://localhost/leaderboard')
 
 class LeaderboardPost
   include DataMapper::Resource
