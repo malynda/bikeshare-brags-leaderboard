@@ -5,14 +5,20 @@ require "pg"
 require "dm-postgres-adapter"
 
 DataMapper.setup(:default, 'postgres://localhost/leaderboard')
-DataMapper.finalize.auto_upgrade!
 
 class LeaderboardPost
   include DataMapper::Resource
-  property :id,    Serial
+  property :id, Serial
   property :name, String
   property :miles, Integer
 end
+
+DataMapper.finalize.auto_upgrade!
+
+LeaderboardPost.create(
+  :name => "Alex",
+  :miles => 200
+)
 
 get "/entries.json" do
   # check to see if sinatra has some built-in json tools you should use
