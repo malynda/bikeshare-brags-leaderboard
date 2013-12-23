@@ -3,7 +3,7 @@ require "sinatra"
 require "data_mapper"
 require "pg"
 require "dm-postgres-adapter"
-require "json"
+require "sinatra/json"
 
 DataMapper.setup(:default, ENV['HEROKU_POSTGRESQL_TEAL_URL'] || 'postgres://localhost/leaderboard')
 
@@ -22,8 +22,7 @@ LeaderboardPost.create(
 )
 
 get "/entries.json" do
-  content_type :json
-  { "1" : LeaderboardPost.get(1).name }.to_json
+  json 1 => { :name => LeaderboardPost.get(1).name, :miles => LeaderboardPost.get(1).miles }
 end
 
 post '/new_entry' do
@@ -32,7 +31,3 @@ post '/new_entry' do
   new_post.save
   # send back the entire list so the sidebar can update the leaderboard! 
 end
-
-get "/" do
-  "Hello, world!"
-end 
