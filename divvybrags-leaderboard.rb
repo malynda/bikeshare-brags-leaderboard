@@ -2,7 +2,7 @@ require "rubygems"
 require "sinatra"
 require "data_mapper"
 require "pg"
-require 'dm-postgres-adapter'
+require "dm-postgres-adapter"
 
 DataMapper.setup(:default, 'postgres://localhost/leaderboard')
 DataMapper.finalize.auto_upgrade!
@@ -27,3 +27,7 @@ post '/new_entry' do
   new_post.save
   # send back the entire list so the sidebar can update the leaderboard! 
 end
+
+get "/" do
+  "Hello, world!"
+end 
