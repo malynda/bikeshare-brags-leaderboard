@@ -79,5 +79,6 @@ DEPENDENCIES
   data_mapper
   dm-postgres-adapter
   dm-sqlite-adapter
+  json
   pg
   sinatra
