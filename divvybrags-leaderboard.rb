@@ -1,8 +1,11 @@
 require "rubygems"
 require "sinatra"
 require "data_mapper"
+require "pg"
+require 'dm-postgres-adapter'
 
-DataMapper.setup(:default, ENV['DATABASE_URL'] || 'postgres://localhost/mydb')
+DataMapper.setup(:default, 'postgres://localhost/leaderboard')
+DataMapper.finalize.auto_upgrade!
 
 class LeaderboardPost
   include DataMapper::Resource
