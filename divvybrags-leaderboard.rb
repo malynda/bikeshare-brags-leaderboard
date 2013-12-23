@@ -16,18 +16,23 @@ end
 
 DataMapper.finalize.auto_upgrade!
 
-LeaderboardPost.create(
-  :name => "Alex",
-  :miles => 200
-)
-
 get "/entries.json" do
-  json 1 => { :name => LeaderboardPost.get(1).name, :miles => LeaderboardPost.get(1).miles }
+
+  @leaderboard = LeaderboardPost.all(:order => [:miles.desc])
+  @leaderboard_json = []
+  n = 1
+
+  @leaderboard.each do |p|
+    @leaderboard_json << { n => { :name => p.name, :miles => p.miles } } 
+    n += 1
+  end
+
+  json @leaderboard_json
+
 end
 
 post '/new_entry' do
   new_post = LeaderboardPost.first_or_create(:name => params[:name])
   new_post.miles = params[:miles]
   new_post.save
-  # send back the entire list so the sidebar can update the leaderboard! 
 end
