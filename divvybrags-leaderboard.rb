@@ -46,7 +46,7 @@ post '/new_entry' do
     n += 1
   end
 
-  @leaderboard_ranking each do |p|
+  @leaderboard_ranking.each do |p|
     if p[p.keys[0]][:name] == params[:name] then @my_entry = p end
   end
 
