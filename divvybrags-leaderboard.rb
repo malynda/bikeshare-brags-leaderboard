@@ -32,7 +32,20 @@ get "/entries.json" do
 end
 
 post '/new_entry' do
+  
   new_post = LeaderboardPost.first_or_create(:name => params[:name])
   new_post.miles = params[:miles]
   new_post.save
+
+  @leaderboard = LeaderboardPost.all(:order => [:miles.desc])
+  @leaderboard_json = []
+  n = 1
+
+  @leaderboard.each do |p|
+    @leaderboard_json << { n => { :name => p.name, :miles => p.miles } } 
+    n += 1
+  end
+
+  json @leaderboard_json
+  
 end
