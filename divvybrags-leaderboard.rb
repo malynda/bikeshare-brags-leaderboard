@@ -38,14 +38,18 @@ post '/new_entry' do
   new_post.save
 
   @leaderboard = LeaderboardPost.all(:order => [:miles.desc])
-  @leaderboard_json = []
+  @leaderboard_ranking = []
   n = 1
 
   @leaderboard.each do |p|
-    @leaderboard_json << { n => { :name => p.name, :miles => p.miles } } 
+    @leaderboard_ranking << { n => { :name => p.name, :miles => p.miles } } 
     n += 1
   end
 
-  json @leaderboard_json
-  
+  @leaderboard_ranking each do |p|
+    if p[p.keys[0]][:name] == params[:name] then @my_entry = p end
+  end
+
+  json :leaderboard => @leaderboard_ranking, :my_entry => @my_entry
+
 end
