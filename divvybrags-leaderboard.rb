@@ -67,7 +67,7 @@ post '/new_entry' do
   # Pull out the leaderboard entry that's just been submitted as special
 
   @leaderboard_ranking.each do |p|
-    if p[p.keys[0]][:name] == params[:name] then @my_entry = p end
+    if p[p.keys[0]][:name].strip.upcase == params[:name].strip.upcase then @my_entry = p end
   end
 
   json :leaderboard => @leaderboard_ranking, :my_entry => @my_entry
