@@ -32,10 +32,28 @@ get "/entries.json" do
 end
 
 post '/new_entry' do
+
+  # Check to see if anyone has a similar name in the database already. 
   
-  new_post = LeaderboardPost.first_or_create(:name => params[:name])
-  new_post.miles = params[:miles]
-  new_post.save
+  @already_in_db = false
+
+  LeaderboardPost.all.each do |p|
+    if p.name.strip.upcase == params[:name].strip.upcase
+      p.miles = params[:miles]
+      if p.save
+        @already_in_db = true
+      end
+    end
+  end
+
+  # If nobody's taken that name yet, make a new entry in the database
+
+  if @already_in_db == false
+    new_post = LeaderboardPost.create(:name => params[:name], :miles => params[:miles])
+    new_post.save
+  end
+
+  # Now line up all the leaderboard posts and organize them by milage so we can return a new leaderboard
 
   @leaderboard = LeaderboardPost.all(:order => [:miles.desc])
   @leaderboard_ranking = []
@@ -45,6 +63,8 @@ post '/new_entry' do
     @leaderboard_ranking << { n => { :name => p.name, :miles => p.miles } } 
     n += 1
   end
+
+  # Pull out the leaderboard entry that's just been submitted as special
 
   @leaderboard_ranking.each do |p|
     if p[p.keys[0]][:name] == params[:name] then @my_entry = p end
