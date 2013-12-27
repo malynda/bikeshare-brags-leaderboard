@@ -28,7 +28,7 @@ get "/entries.json" do
   n = 1
 
   @leaderboard.each do |p|
-    @leaderboard_json << { n => { :name => p.name, :miles => p.miles } } 
+    @leaderboard_json << { n => { :name => p.name, :miles => p.miles, :extra_unique_id => p.extra_unique_id } } 
     n += 1
   end
 
