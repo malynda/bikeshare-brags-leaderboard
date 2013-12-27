@@ -5,6 +5,8 @@ require "pg"
 require "dm-postgres-adapter"
 require "sinatra/json"
 
+disable :protection
+
 DataMapper.setup(:default, ENV['HEROKU_POSTGRESQL_TEAL_URL'] || 'postgres://localhost/leaderboard')
 
 class LeaderboardPost
