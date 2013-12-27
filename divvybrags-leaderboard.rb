@@ -35,9 +35,14 @@ get "/entries" do
 
   @leaderboard = LeaderboardPost.all(:order => [:miles.desc])
   n = 1
+  sinatra_html = ''
   @leaderboard.each do |p|
-    n.to_s + ". " + p.name + ": " + p.miles 
+    post_html = n.to_s + ". " + p.name + ": " + p.miles.to_s + "<br>"
+    sinatra_html += post_html
+    n += 1
   end
+
+  sinatra_html
 
 end
 
