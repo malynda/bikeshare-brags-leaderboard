@@ -40,7 +40,7 @@ get "/entries" do
 
   @leaderboard = LeaderboardPost.all(:order => [:miles.desc])
   n = 1
-  sinatra_html = ''
+  sinatra_html = '<link rel="stylesheet" href="/assets/main.css">'
   @leaderboard.each do |p|
     post_html = n.to_s + ". " + p.name + ": " + p.miles.to_s + "mi<br>"
     sinatra_html += post_html
@@ -53,7 +53,7 @@ end
 
 post '/new_entry' do
 
-  # Check to see if anyone has a similar name in the database already. 
+  # Check to see if anyone has that extra unique ID in the database already
   
   @already_in_db = false
 
@@ -66,7 +66,7 @@ post '/new_entry' do
     end
   end
 
-  # If nobody's taken that name yet, make a new entry in the database
+  # If nobody's there with that extra unique id, then we know it's a new user!
 
   if @already_in_db == false
     new_post = LeaderboardPost.create(:name => params[:name], :miles => params[:miles], :extra_unique_id => params[:extra_unique_id], :city => params[:city])
