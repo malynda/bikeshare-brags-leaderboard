@@ -19,7 +19,9 @@ class LeaderboardPost
   property :city, String
 end
 
-DataMapper.finalize.auto_upgrade!
+DataMapper.finalize
+
+LeaderboardPost.auto_upgrade!
 
 get "/entries.json" do
 
