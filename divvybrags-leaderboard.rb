@@ -58,7 +58,7 @@ post '/new_entry' do
   @already_in_db = false
 
   LeaderboardPost.all.each do |p|
-    if p.extra_unique_id == params[:extra_unique_id]
+    if p.extra_unique_id == params[:extra_unique_id].to_i
       p.miles = params[:miles]
       if p.save
         @already_in_db = true
