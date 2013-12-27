@@ -58,7 +58,7 @@ post '/new_entry' do
   @already_in_db = false
 
   LeaderboardPost.all.each do |p|
-    if p.first_trip_id == params[:first_trip_id]
+    if p.extra_unique_id == params[:extra_unique_id]
       p.miles = params[:miles]
       if p.save
         @already_in_db = true
@@ -69,7 +69,7 @@ post '/new_entry' do
   # If nobody's taken that name yet, make a new entry in the database
 
   if @already_in_db == false
-    new_post = LeaderboardPost.create(:name => params[:name], :miles => params[:miles], :first_trip_id => params[:first_trip_id], :city => params[:city])
+    new_post = LeaderboardPost.create(:name => params[:name], :miles => params[:miles], :extra_unique_id => params[:extra_unique_id], :city => params[:city])
     new_post.save
   end
 
