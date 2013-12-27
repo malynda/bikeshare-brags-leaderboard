@@ -31,6 +31,16 @@ get "/entries.json" do
 
 end
 
+get "/entries" do
+
+  @leaderboard = LeaderboardPost.all(:order => [:miles.desc])
+  n = 1
+  @leaderboard.each do |p|
+    n.to_s + ". " + p.name + ": " + p.miles 
+  end
+
+end
+
 post '/new_entry' do
 
   # Check to see if anyone has a similar name in the database already. 
