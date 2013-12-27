@@ -14,7 +14,7 @@ class LeaderboardPost
   property :id, Serial
   property :name, String
   property :miles, Integer
-  property :first_trip_id, Integer
+  property :extra_unique_id, Integer
   property :city, String
 end
 
