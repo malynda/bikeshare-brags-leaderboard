@@ -4,7 +4,6 @@ require "data_mapper"
 require "pg"
 require "dm-postgres-adapter"
 require "sinatra/json"
-require "sass"
 
 disable :protection   # This was messing with the iframing
 
