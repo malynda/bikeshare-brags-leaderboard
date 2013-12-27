@@ -1,4 +1,4 @@
 <IfModule mod_headers.c>
   Header set Access-Control-Allow-Origin: "*"
-  Header set X-Frame-Options ALLOW-FROM divvybrags.com
+  Header set X-Frame-Options ALLOW-FROM: http://divvybrags.com
 </IfModule>
