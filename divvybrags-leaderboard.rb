@@ -4,8 +4,9 @@ require "data_mapper"
 require "pg"
 require "dm-postgres-adapter"
 require "sinatra/json"
+require "sass"
 
-disable :protection
+disable :protection   # This was messing with the iframing
 
 DataMapper.setup(:default, ENV['HEROKU_POSTGRESQL_TEAL_URL'] || 'postgres://localhost/leaderboard')
 
@@ -14,6 +15,8 @@ class LeaderboardPost
   property :id, Serial
   property :name, String
   property :miles, Integer
+  property :first_trip_id, Integer
+  property :city, String
 end
 
 DataMapper.finalize.auto_upgrade!
@@ -39,7 +42,7 @@ get "/entries" do
   n = 1
   sinatra_html = ''
   @leaderboard.each do |p|
-    post_html = n.to_s + ". " + p.name + ": " + p.miles.to_s + "<br>"
+    post_html = n.to_s + ". " + p.name + ": " + p.miles.to_s + "mi<br>"
     sinatra_html += post_html
     n += 1
   end
@@ -55,7 +58,7 @@ post '/new_entry' do
   @already_in_db = false
 
   LeaderboardPost.all.each do |p|
-    if p.name.strip.upcase == params[:name].strip.upcase
+    if p.first_trip_id == params[:first_trip_id]
       p.miles = params[:miles]
       if p.save
         @already_in_db = true
@@ -66,7 +69,7 @@ post '/new_entry' do
   # If nobody's taken that name yet, make a new entry in the database
 
   if @already_in_db == false
-    new_post = LeaderboardPost.create(:name => params[:name], :miles => params[:miles])
+    new_post = LeaderboardPost.create(:name => params[:name], :miles => params[:miles], :first_trip_id => params[:first_trip_id], :city => params[:city])
     new_post.save
   end
 
