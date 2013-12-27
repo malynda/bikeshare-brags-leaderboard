@@ -20,8 +20,7 @@ class LeaderboardPost
 end
 
 DataMapper.finalize
-
-LeaderboardPost.auto_upgrade!
+DataMapper.auto_upgrade!
 
 get "/entries.json" do
 
