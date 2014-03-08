@@ -5,7 +5,7 @@ require "pg"
 require "dm-postgres-adapter"
 require "sinatra/json"
 
-disable :protection   # This was messing with the iframing
+disable :protection             # This was messing with the iframing
 
 DataMapper.setup(:default, ENV['HEROKU_POSTGRESQL_TEAL_URL'] || 'postgres://localhost/leaderboard')
 
@@ -22,7 +22,7 @@ end
 DataMapper.finalize
 DataMapper.auto_upgrade!
 
-get "/entries.json" do
+get "/entries.json" do            # JSON output for the Chrome extensions to consume
 
   @leaderboard = LeaderboardPost.all(:order => [:miles.desc])
   @leaderboard_json = []
@@ -37,12 +37,9 @@ get "/entries.json" do
 
 end
 
-get "/entries/:city/:month" do
+get "/entries/:city/" do    # HTML output for the static site iframe 
   
   @leaderboard = LeaderboardPost.all(order: [:miles.desc], city: params[:city])  # Return leaderboard for the right city and month
-  if params[:month].present?
-    @leaderboard = @leaderboard.all(month: params[:month])
-  end
   n = 1
   sinatra_html = '<link rel="stylesheet" href="/assets/main.css">'
   @leaderboard.each do |p|
