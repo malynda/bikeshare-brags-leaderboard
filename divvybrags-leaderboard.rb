@@ -24,7 +24,7 @@ DataMapper.auto_upgrade!
 
 get "/entries.json" do            # JSON output for the Chrome extensions to consume
 
-  @leaderboard = LeaderboardPost.all(:order => [:miles.desc])
+  @leaderboard = LeaderboardPost.all(:order => [:miles.desc], city: params[:city])
   @leaderboard_json = []
   n = 1
 
@@ -37,9 +37,9 @@ get "/entries.json" do            # JSON output for the Chrome extensions to con
 
 end
 
-get "/entries/:city/" do    # HTML output for the static site iframe 
+get "/entries/:city/" do          # HTML output for the static site iframe 
   
-  @leaderboard = LeaderboardPost.all(order: [:miles.desc], city: params[:city])  # Return leaderboard for the right city and month
+  @leaderboard = LeaderboardPost.all(order: [:miles.desc], city: params[:city])  # Return leaderboard for the right city
   n = 1
   sinatra_html = '<link rel="stylesheet" href="/assets/main.css">'
   @leaderboard.each do |p|
