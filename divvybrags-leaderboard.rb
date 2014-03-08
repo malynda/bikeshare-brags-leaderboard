@@ -41,7 +41,7 @@ get "/entries/:city/:month" do
   
   @leaderboard = LeaderboardPost.all(order: [:miles.desc], city: params[:city])  # Return leaderboard for the right city and month
   if params[:month].present?
-    @leaderboard = @leaderboard(month: params[:month])
+    @leaderboard = @leaderboard.all(month: params[:month])
   end
   n = 1
   sinatra_html = '<link rel="stylesheet" href="/assets/main.css">'
