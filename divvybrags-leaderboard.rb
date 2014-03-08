@@ -16,6 +16,7 @@ class LeaderboardPost
   property :miles, Integer
   property :extra_unique_id, Integer
   property :city, String
+  property :month, String
 end
 
 DataMapper.finalize
@@ -36,9 +37,12 @@ get "/entries.json" do
 
 end
 
-get "/entries" do
-
-  @leaderboard = LeaderboardPost.all(:order => [:miles.desc])
+get "/entries/:city/:month" do
+  
+  @leaderboard = LeaderboardPost.all(order: [:miles.desc], city: params[:city])  # Return leaderboard for the right city and month
+  if params[:month].present?
+    @leaderboard = @leaderboard(month: params[:month])
+  end
   n = 1
   sinatra_html = '<link rel="stylesheet" href="/assets/main.css">'
   @leaderboard.each do |p|
@@ -46,7 +50,6 @@ get "/entries" do
     sinatra_html += post_html
     n += 1
   end
-
   sinatra_html
 
 end
@@ -54,9 +57,7 @@ end
 post '/new_entry' do
 
   # Check to see if anyone has that extra unique ID in the database already
-  
   @already_in_db = false
-
   LeaderboardPost.all.each do |p|
     if p.extra_unique_id == params[:extra_unique_id].to_i
       p.miles = params[:miles]
@@ -67,29 +68,24 @@ post '/new_entry' do
   end
 
   # If nobody's there with that extra unique id, then we know it's a new user!
-
   if @already_in_db == false
     new_post = LeaderboardPost.create(:name => params[:name], :miles => params[:miles], :extra_unique_id => params[:extra_unique_id], :city => params[:city])
     new_post.save
   end
 
   # Now line up all the leaderboard posts and organize them by milage so we can return a new leaderboard
-
   @leaderboard = LeaderboardPost.all(:order => [:miles.desc])
   @leaderboard_ranking = []
   n = 1
-
   @leaderboard.each do |p|
     @leaderboard_ranking << { n => { :name => p.name, :miles => p.miles } } 
     n += 1
   end
 
   # Pull out the leaderboard entry that's just been submitted as special
-
   @leaderboard_ranking.each do |p|
     if p[p.keys[0]][:name].strip.upcase == params[:name].strip.upcase then @my_entry = p end
   end
-
   json :leaderboard => @leaderboard_ranking, :my_entry => @my_entry
 
 end
