@@ -14,7 +14,7 @@ class LeaderboardPost
   property :id, Serial
   property :name, String
   property :miles, Integer
-  property :extra_unique_id, BIGINT, :min => 0, :max => 999999999999
+  property :extra_unique_id, Integer, :min => 0, :max => 999999999999
   property :city, String
   property :month, String
   property :year, Integer
