@@ -54,11 +54,13 @@ end
 
 post '/new_entry' do
 
+  @leaderboard_post = params[:leaderboard_post]
+
   # Check to see if anyone has that extra unique ID in the database already
   @already_in_db = false
   LeaderboardPost.all.each do |p|
-    if p.extra_unique_id == params[:extra_unique_id].to_i
-      p.miles = params[:miles]
+    if p.extra_unique_id == @leaderboard_post[:extra_unique_id].to_i
+      p.miles = @leaderboard_post[:miles]
       if p.save
         @already_in_db = true
       end
@@ -67,15 +69,15 @@ post '/new_entry' do
 
   # If nobody's there with that extra unique id, then we know it's a new user!
   if @already_in_db == false
-    new_post = LeaderboardPost.create(name: params[:name], miles: params[:miles], extra_unique_id: params[:extra_unique_id], city: params[:city], month: params[:month], year: params[:year])
+    new_post = LeaderboardPost.create(@leaderboard_post)
     new_post.save
   end
 
   json :my_entry => new_post
 
   # Now line up all the leaderboard posts and organize them by milage so we can return a new leaderboard
-  @leaderboard = LeaderboardPost.all(order: [:miles.desc], city: params[:city])
-  if params[:city] == "Chicago"
+  @leaderboard = LeaderboardPost.all(order: [:miles.desc], city: @leaderboard_post[:city])
+  if @leaderboard_post[:city] == "Chicago"
     @leaderboard_ranking, n = [], 1
     @leaderboard.each do |p|
       @leaderboard_ranking << { n => { name: p.name, miles: p.miles } } 
@@ -91,7 +93,7 @@ post '/new_entry' do
 
   # Pull out the leaderboard entry that's just been submitted as special
   @leaderboard_ranking.each do |p|
-    if p[p.keys[0]][:name].strip.upcase == params[:name].strip.upcase then @my_entry = p end
+    if p[p.keys[0]][:name].strip.upcase == @leaderboard_post[:name].strip.upcase then @my_entry = p end
   end
   json :leaderboard => @leaderboard_ranking, :my_entry => @my_entry
 
