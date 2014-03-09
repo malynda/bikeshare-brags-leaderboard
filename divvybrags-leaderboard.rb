@@ -97,7 +97,9 @@ post '/new_entry' do
           @month_ranking << { n => { name: p.name, miles: p.miles } }
           n +=1
         end
-        @leaderboard_ranking << { "#{m}, #{y}" => @month_ranking }
+        if @month_ranking.length > 0
+          @leaderboard_ranking << { "#{m}, #{y}" => @month_ranking }
+        end
       end
     end
     @my_entry = 0
