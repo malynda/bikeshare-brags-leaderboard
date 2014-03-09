@@ -74,24 +74,35 @@ post '/new_entry' do
   end
 
   # Now line up all the leaderboard posts and organize them by milage so we can return a new leaderboard
-  @new_leaderboard = LeaderboardPost.all(order: [:miles.desc], city: @leaderboard_post[:city])
-  @leaderboard_ranking, n = [], 1
   if @leaderboard_post[:city] == "Chicago"
+    @new_leaderboard = LeaderboardPost.all(order: [:miles.desc], city: "Chicago")
+    @leaderboard_ranking, n = [], 1
     @new_leaderboard.each do |p|
       @leaderboard_ranking << { n => { name: p.name, miles: p.miles } } 
       n += 1
     end
-  else
-    @new_leaderboard.each do |p|
-      @leaderboard_ranking << { n => { name: p.name, miles: p.miles } }     # Eventually this should sort the leaderboard by month
-      n += 1
+    # Pull out the leaderboard entry that's just been submitted as special
+    @leaderboard_ranking.each do |p|
+      if p[p.keys[0]][:name].strip.upcase == @leaderboard_post[:name].strip.upcase then @my_entry = p end
     end
+  else
+    month_names = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"] 
+    years = [2013, 2014, 2015]
+    @leaderboard_ranking = []
+    years.each do |y|
+      month_names.each do |m|
+        @month_posts = LeaderboardPost.all(month: m, year: y, order: [:miles.desc])
+        @month_ranking, n = [], 1
+        @month_posts.each do |p|
+          @month_ranking << { n => { name: p.name, miles: p.miles } }
+          n +=1
+        end
+        @leaderboard_ranking << { "#{m}, #{y}" => @month_ranking }
+      end
+    end
+    @my_entry = 0
   end
 
-  # Pull out the leaderboard entry that's just been submitted as special
-  @leaderboard_ranking.each do |p|
-    if p[p.keys[0]][:name].strip.upcase == @leaderboard_post[:name].strip.upcase then @my_entry = p end
-  end
   json :leaderboard => @leaderboard_ranking, :my_entry => @my_entry
 
 end
