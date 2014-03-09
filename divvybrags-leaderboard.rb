@@ -70,19 +70,21 @@ post '/new_entry' do
     new_post.save
   end
 
-  # Now line up all the leaderboard posts and organize them by milage so we can return a new leaderboard
-  @leaderboard = LeaderboardPost.all(:order => [:miles.desc])
-  @leaderboard_ranking = []
-  n = 1
-  @leaderboard.each do |p|
-    @leaderboard_ranking << { n => { :name => p.name, :miles => p.miles } } 
-    n += 1
-  end
+  json :my_entry => new_post
 
-  # Pull out the leaderboard entry that's just been submitted as special
-  @leaderboard_ranking.each do |p|
-    if p[p.keys[0]][:name].strip.upcase == params[:name].strip.upcase then @my_entry = p end
-  end
-  json :leaderboard => @leaderboard_ranking, :my_entry => @my_entry
+  # # Now line up all the leaderboard posts and organize them by milage so we can return a new leaderboard
+  # @leaderboard = LeaderboardPost.all(:order => [:miles.desc])
+  # @leaderboard_ranking = []
+  # n = 1
+  # @leaderboard.each do |p|
+  #   @leaderboard_ranking << { n => { name: p.name, miles: p.miles } } 
+  #   n += 1
+  # end
+
+  # # Pull out the leaderboard entry that's just been submitted as special
+  # @leaderboard_ranking.each do |p|
+  #   if p[p.keys[0]][:name].strip.upcase == params[:name].strip.upcase then @my_entry = p end
+  # end
+  # json :leaderboard => @leaderboard_ranking, :my_entry => @my_entry
 
 end
