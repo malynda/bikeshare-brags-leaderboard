@@ -67,7 +67,7 @@ post '/new_entry' do
 
   # If nobody's there with that extra unique id, then we know it's a new user!
   if @already_in_db == false
-    new_post = LeaderboardPost.create(name: params[:name], miles: params[:miles], extra_unique_id: params[:extra_unique_id], city: params[:city], month: params[:month], year: params[)
+    new_post = LeaderboardPost.create(name: params[:name], miles: params[:miles], extra_unique_id: params[:extra_unique_id], city: params[:city], month: params[:month], year: params[:year])
     new_post.save
   end
 
