@@ -14,7 +14,7 @@ class LeaderboardPost
   property :id, Serial
   property :name, String
   property :miles, Integer
-  property :extra_unique_id, Integer, :min => 0, :max => 999999999999
+  property :extra_unique_id, BIGINT, :min => 0, :max => 999999999999
   property :city, String
   property :month, String
   property :year, Integer
@@ -74,16 +74,15 @@ post '/new_entry' do
   end
 
   # Now line up all the leaderboard posts and organize them by milage so we can return a new leaderboard
-  @leaderboard = LeaderboardPost.all(order: [:miles.desc], city: @leaderboard_post[:city])
+  @new_leaderboard = LeaderboardPost.all(order: [:miles.desc], city: @leaderboard_post[:city])
+  @leaderboard_ranking, n = [], 1
   if @leaderboard_post[:city] == "Chicago"
-    @leaderboard_ranking, n = [], 1
-    @leaderboard.each do |p|
+    @new_leaderboard.each do |p|
       @leaderboard_ranking << { n => { name: p.name, miles: p.miles } } 
       n += 1
     end
   else
-    @leaderboard_ranking, n = [], 1
-    @leaderboard.each do |p|
+    @new_leaderboard.each do |p|
       @leaderboard_ranking << { n => { name: p.name, miles: p.miles } }     # Eventually this should sort the leaderboard by month
       n += 1
     end
