@@ -73,8 +73,6 @@ post '/new_entry' do
     new_post.save
   end
 
-  json :my_entry => new_post
-
   # Now line up all the leaderboard posts and organize them by milage so we can return a new leaderboard
   @leaderboard = LeaderboardPost.all(order: [:miles.desc], city: @leaderboard_post[:city])
   if @leaderboard_post[:city] == "Chicago"
