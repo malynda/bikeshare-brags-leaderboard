@@ -14,9 +14,10 @@ class LeaderboardPost
   property :id, Serial
   property :name, String
   property :miles, Integer
-  property :extra_unique_id, Integer
+  property :extra_unique_id, Integer, :min => 0, :max => 999999999999
   property :city, String
   property :month, String
+  property :year, Integer
 end
 
 DataMapper.finalize
@@ -66,25 +67,32 @@ post '/new_entry' do
 
   # If nobody's there with that extra unique id, then we know it's a new user!
   if @already_in_db == false
-    new_post = LeaderboardPost.create(name: params[:name], miles: params[:miles], extra_unique_id: params[:extra_unique_id], city: params[:city], month: params[:month])
+    new_post = LeaderboardPost.create(name: params[:name], miles: params[:miles], extra_unique_id: params[:extra_unique_id], city: params[:city], month: params[:month], year: params[)
     new_post.save
   end
 
   json :my_entry => new_post
 
-  # # Now line up all the leaderboard posts and organize them by milage so we can return a new leaderboard
-  # @leaderboard = LeaderboardPost.all(:order => [:miles.desc])
-  # @leaderboard_ranking = []
-  # n = 1
-  # @leaderboard.each do |p|
-  #   @leaderboard_ranking << { n => { name: p.name, miles: p.miles } } 
-  #   n += 1
-  # end
+  # Now line up all the leaderboard posts and organize them by milage so we can return a new leaderboard
+  @leaderboard = LeaderboardPost.all(order: [:miles.desc], city: params[:city])
+  if params[:city] == "Chicago"
+    @leaderboard_ranking, n = [], 1
+    @leaderboard.each do |p|
+      @leaderboard_ranking << { n => { name: p.name, miles: p.miles } } 
+      n += 1
+    end
+  else
+    @leaderboard_ranking, n = [], 1
+    @leaderboard.each do |p|
+      @leaderboard_ranking << { n => { name: p.name, miles: p.miles } }     # Eventually this should sort the leaderboard by month
+      n += 1
+    end
+  end
 
-  # # Pull out the leaderboard entry that's just been submitted as special
-  # @leaderboard_ranking.each do |p|
-  #   if p[p.keys[0]][:name].strip.upcase == params[:name].strip.upcase then @my_entry = p end
-  # end
-  # json :leaderboard => @leaderboard_ranking, :my_entry => @my_entry
+  # Pull out the leaderboard entry that's just been submitted as special
+  @leaderboard_ranking.each do |p|
+    if p[p.keys[0]][:name].strip.upcase == params[:name].strip.upcase then @my_entry = p end
+  end
+  json :leaderboard => @leaderboard_ranking, :my_entry => @my_entry
 
 end
