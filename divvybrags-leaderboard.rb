@@ -26,16 +26,34 @@ DataMapper.auto_upgrade!
 get "/entries.json" do            # JSON output for the Chrome extensions to consume
 
   @leaderboard = LeaderboardPost.all(:order => [:miles.desc], city: params[:city])
-  @leaderboard_json = []
-  n = 1
 
-  @leaderboard.each do |p|
-    @leaderboard_json << { n => { :name => p.name, :miles => p.miles, :extra_unique_id => p.extra_unique_id } } 
-    n += 1
+  if params[:city] == "Chicago"
+    @leaderboard_json, n = [], 1
+    @leaderboard.each do |p|
+      @leaderboard_json << { n => { :name => p.name, :miles => p.miles, :extra_unique_id => p.extra_unique_id } } 
+      n += 1
+    end
+    json @leaderboard_json
+  elsif params[:city] == "New York"
+    @leaderboard_json = []
+    month_names = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"] 
+    years = [2013, 2014, 2015]
+    @leaderboard_ranking = []
+    years.each do |y|
+      month_names.each do |m|
+        @month_posts = LeaderboardPost.all(month: m, year: y, order: [:miles.desc])
+        @month_ranking, n = [], 1
+        @month_posts.each do |p|
+          @month_ranking << { n => { name: p.name, miles: p.miles } }
+          n +=1
+        end
+        if @month_ranking.length > 0
+          @leaderboard_json << { "#{m} #{y}" => @month_ranking }
+        end
+      end
+    end
+    json @leaderboard_json
   end
-
-  json @leaderboard_json
-
 end
 
 get "/entries/:city/" do          # HTML output for the static site iframe 
@@ -98,7 +116,7 @@ post '/new_entry' do
           n +=1
         end
         if @month_ranking.length > 0
-          @leaderboard_ranking << { "#{m}, #{y}" => @month_ranking }
+          @leaderboard_ranking << { "#{m} #{y}" => @month_ranking }
         end
       end
     end
