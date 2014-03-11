@@ -36,8 +36,8 @@ get "/entries.json" do            # JSON output for the Chrome extensions to con
     json @leaderboard_json
   elsif params[:city] == "New York"
     @leaderboard_json = []
-    month_names = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"] 
-    years = [2013, 2014, 2015]
+    month_names =  ["December", "November", "October", "September", "August", "July", "June", "May", "April", "March", "February", "January"] 
+    years = [2015, 2014, 2013]
     @leaderboard_ranking = []
     years.each do |y|
       month_names.each do |m|
@@ -104,8 +104,8 @@ post '/new_entry' do
       if p[p.keys[0]][:name].strip.upcase == @leaderboard_post[:name].strip.upcase then @my_entry = p end
     end
   else
-    month_names = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"] 
-    years = [2013, 2014, 2015]
+    month_names =  ["December", "November", "October", "September", "August", "July", "June", "May", "April", "March", "February", "January"] 
+    years = [2015, 2014, 2013]
     @leaderboard_ranking = []
     years.each do |y|
       month_names.each do |m|
