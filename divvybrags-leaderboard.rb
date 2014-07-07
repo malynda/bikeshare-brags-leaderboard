@@ -68,6 +68,9 @@ get "/entries/:city/" do          # HTML output for the static site iframe
   n = 1
   sinatra_html = '<link rel="stylesheet" href="/assets/main.css">'
   @leaderboard.each do |p|
+
+    # TODO: Add up leaderboard posts with the same name
+    # Return two kinds of leaderboards for each city: total milage and by-month
     post_html = n.to_s + ". " + p.name + ": " + p.miles.to_s + "mi<br>"
     sinatra_html += post_html
     n += 1
@@ -98,6 +101,10 @@ post '/new_entry' do
   end
 
   # Now line up all the leaderboard posts and organize them by milage so we can return a new leaderboard
+  
+  # TODO: Put NYC and Chicago aon the same system for returning leaderboard since 
+  # their Alta websites follow the same patterns now! 
+
   if @leaderboard_post[:city] == "Chicago"
     @new_leaderboard = LeaderboardPost.all(order: [:miles.desc], city: "Chicago")
     @leaderboard_ranking, n = [], 1
