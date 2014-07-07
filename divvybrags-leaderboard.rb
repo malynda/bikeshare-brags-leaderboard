@@ -57,8 +57,14 @@ get "/entries.json" do            # JSON output for the Chrome extensions to con
 end
 
 get "/entries/:city/" do          # HTML output for the static site iframe 
+
+  if params[:city] == "NewYork"
+    params_city = "New York"
+  else
+    params_city = params[:city]
+  end
   
-  @leaderboard = LeaderboardPost.all(order: [:miles.desc], city: params[:city])  # Return leaderboard for the right city
+  @leaderboard = LeaderboardPost.all(order: [:miles.desc], city: params_city)  # Return leaderboard for the right city
   n = 1
   sinatra_html = '<link rel="stylesheet" href="/assets/main.css">'
   @leaderboard.each do |p|
