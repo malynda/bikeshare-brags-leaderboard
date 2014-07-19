@@ -14,7 +14,6 @@ class LeaderboardPost
   property :id, Serial
   property :name, String
   property :miles, Integer
-  property :extra_unique_id, Integer, :min => 0, :max => 999999999999
   property :city, String
   property :month, String
   property :year, Integer
@@ -132,27 +131,9 @@ end
 
 post '/new_entry' do
 
-  @leaderboard_post = params[:leaderboard_post]
-
-  # Check to see if anyone has that extra unique ID in the database already
-  @already_in_db = false
-  LeaderboardPost.all.each do |p|
-    if p.extra_unique_id == @leaderboard_post[:extra_unique_id].to_i
-      p.miles = @leaderboard_post[:miles]
-      if p.save
-        @already_in_db = true
-      end
-    end
-  end
-
-  # If nobody's there with that extra unique id, then we know it's a new user!
-  if @already_in_db == false
-    new_post = LeaderboardPost.create(@leaderboard_post)
-    new_post.save
-  end
+  LeaderboardPost.create(params[:leaderboard_post])  # ToDo: check for already existing name, let user know if their name is already taken
 
   # Now line up all the leaderboard posts and organize them by milage so we can return a new leaderboard
-  
   month_names =  ["December", "November", "October", "September", "August", "July", "June", "May", "April", "March", "February", "January"] 
   years = [2015, 2014, 2013]
   @leaderboard_ranking = []
