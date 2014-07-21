@@ -63,17 +63,17 @@ get "/entries/:city/:timeperiod/" do          # HTML output for the static site 
 
     ranking_hash = {}  # initialize
 
-    leaderboard_by_name = LeaderboardPost.all(city: params_city).group_by { |p| p.name }  
+    leaderboard_by_name = LeaderboardPost.all(city: params_city, :month.not => nil).group_by { |p| p.name }  
     # Grouping by name in line 76 is dependent on each user-selected name being unique.
     # Unrealistic in the long run, but works for now.
     top_bike_sharers = leaderboard_by_name.keys
-    top_bike_sharers.each do |bs|
-      this_persons_posts = leaderboard_by_name[bs]
+    top_bike_sharers.each do |bikesharer|
+      this_persons_posts = leaderboard_by_name[bikesharer]
       this_persons_miles = 0  # initialize
       this_persons_posts.each do |p|
         this_persons_miles += p.miles
       end
-      ranking_hash[bs] = this_persons_miles
+      ranking_hash[bikesharer] = this_persons_miles
     end
 
     leaderboard_hash = ranking_hash.sort_by{|key, value| value}.reverse
