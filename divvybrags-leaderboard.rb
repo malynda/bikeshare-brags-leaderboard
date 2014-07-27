@@ -134,18 +134,18 @@ post '/new_entry' do
   @leaderboard_post = params[:leaderboard_post]
   
   # Check to see if anyone has that name in the database already
-  @already_in_db = false
-  LeaderboardPost.all.each do |p|
-   if p.name == @leaderboard_post[:name]
-       @already_in_db = true
-       json :status => "name taken"
-     end
-  end
+  # @already_in_db = false
+  # LeaderboardPost.all.each do |p|
+  #  if p.name == @leaderboard_post[:name]
+  #      @already_in_db = true
+  #      json :status => "name taken"
+  #    end
+  # end
 
   # If nobody's there with that name, it's a new user!
-  if @already_in_db == false
+  # if @already_in_db == false
    new_post = LeaderboardPost.create(@leaderboard_post)
-  end
+  # end
 
   # Now line up all the leaderboard posts and organize them by milage so we can return a new leaderboard
   month_names =  ["December", "November", "October", "September", "August", "July", "June", "May", "April", "March", "February", "January"] 
