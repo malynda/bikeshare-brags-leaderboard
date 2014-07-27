@@ -67,7 +67,7 @@ get "/entries/:city/:timeperiod/" do          # HTML output for the static site 
     # Grouping by name in line 76 is dependent on each user-selected name being unique.
     # Unrealistic in the long run, but works for now.
     top_bike_sharers = leaderboard_by_name.keys
-    top_bike_sharers.each do |bikesharer|
+    top_bike_sharers.each do |bikesharer|w
       this_persons_posts = leaderboard_by_name[bikesharer]
       this_persons_miles = 0  # initialize
       this_persons_posts.each do |p|
@@ -130,8 +130,22 @@ get "/entries/:city/:timeperiod/" do          # HTML output for the static site 
 end
 
 post '/new_entry' do
+    
+  @leaderboard_post = params[:leaderboard_post]
+  
+  # Check to see if anyone has that name in the database already
+  @already_in_db = false
+  LeaderboardPost.all.each do |p|
+   if p.name == @leaderboard_post[:name]
+       @already_in_db = true
+       json :status => "name taken"
+     end
+  end
 
-  LeaderboardPost.create(params[:leaderboard_post])  # ToDo: check for already existing name, let user know if their name is already taken
+  # If nobody's there with that name, it's a new user!
+  if @already_in_db == false
+   new_post = LeaderboardPost.create(@leaderboard_post)
+  end
 
   # Now line up all the leaderboard posts and organize them by milage so we can return a new leaderboard
   month_names =  ["December", "November", "October", "September", "August", "July", "June", "May", "April", "March", "February", "January"] 
