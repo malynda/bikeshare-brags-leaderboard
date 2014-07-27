@@ -67,7 +67,7 @@ get "/entries/:city/:timeperiod/" do          # HTML output for the static site 
     # Grouping by name in line 76 is dependent on each user-selected name being unique.
     # Unrealistic in the long run, but works for now.
     top_bike_sharers = leaderboard_by_name.keys
-    top_bike_sharers.each do |bikesharer|w
+    top_bike_sharers.each do |bikesharer|
       this_persons_posts = leaderboard_by_name[bikesharer]
       this_persons_miles = 0  # initialize
       this_persons_posts.each do |p|
