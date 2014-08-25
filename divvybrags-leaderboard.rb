@@ -26,7 +26,7 @@ get "/entries.json" do            # JSON output for the Chrome extensions to con
 
   @leaderboard = LeaderboardPost.all(:order => [:miles.desc], city: params[:city])
   @leaderboard_json = []
-  month_names =  ["December", "November", "October", "September", "August", "July", "June", "May", "April", "March", "February", "January"] 
+  month_names =  ["December", "November", "October", "September", "August", "July", "June", "May", "April", "March", "February", "January"]
   years = [2015, 2014, 2013]
   @leaderboard_ranking = []
   years.each do |y|
@@ -46,7 +46,7 @@ get "/entries.json" do            # JSON output for the Chrome extensions to con
 
 end
 
-get "/entries/:city/:timeperiod/" do          # HTML output for the static site iframe 
+get "/entries/:city/:timeperiod/" do          # HTML output for the static site iframe
 
   if params[:city] == "NewYork"
     params_city = "New York"
@@ -56,14 +56,14 @@ get "/entries/:city/:timeperiod/" do          # HTML output for the static site 
 
   sinatra_html = '<link rel="stylesheet" href="/assets/main.css">'
 
-  if params[:timeperiod] == "alltime" 
+  if params[:timeperiod] == "alltime"
 
     # Return the all-time highest biking totals.
-    # With the Alta website change we need a better way to let users uniquely identify. 
+    # With the Alta website change we need a better way to let users uniquely identify.
 
     ranking_hash = {}  # initialize
 
-    leaderboard_by_name = LeaderboardPost.all(city: params_city, :month.not => nil).group_by { |p| p.name }  
+    leaderboard_by_name = LeaderboardPost.all(city: params_city, :month.not => nil).group_by { |p| p.name }
     # Grouping by name in line 76 is dependent on each user-selected name being unique.
     # Unrealistic in the long run, but works for now.
     top_bike_sharers = leaderboard_by_name.keys
@@ -78,7 +78,7 @@ get "/entries/:city/:timeperiod/" do          # HTML output for the static site 
 
     leaderboard_hash = ranking_hash.sort_by{|key, value| value}.reverse
 
-    n = 1 
+    n = 1
     leaderboard_hash.each do |p|
       name = p[0]
       miles = p[1].to_s
@@ -92,7 +92,7 @@ get "/entries/:city/:timeperiod/" do          # HTML output for the static site 
   if params[:timeperiod] == "monthly"     # Return bike rankings by month
 
     leaderboard, post_html = [], ""
-    month_names =  ["December", "November", "October", "September", "August", "July", "June", "May", "April", "March", "February", "January"] 
+    month_names =  ["December", "November", "October", "September", "August", "July", "June", "May", "April", "March", "February", "January"]
     years = [2015, 2014, 2013]
     leaderboard_ranking = []
     years.each do |y|
@@ -123,32 +123,33 @@ get "/entries/:city/:timeperiod/" do          # HTML output for the static site 
       sinatra_html += month_html
     end
 
-  end 
+  end
 
   sinatra_html
 
 end
 
 post '/new_entry' do
-    
+
   @leaderboard_post = params[:leaderboard_post]
-  
+
   # Check to see if anyone has that name in the database already
-  # @already_in_db = false
-  # LeaderboardPost.all.each do |p|
-  #  if p.name == @leaderboard_post[:name]
-  #      @already_in_db = true
-  #      json :status => "name taken"
-  #    end
-  # end
+  @already_in_db = false
+  LeaderboardPost.all.each do |p|
+   if p.name == @leaderboard_post[:name]
+       @already_in_db = true
+      #  json :status => "name taken"
+       @leaderboard_post.update_attributes(params[:name][:miles])
+     end
+  end
 
   # If nobody's there with that name, it's a new user!
-  # if @already_in_db == false
+  if @already_in_db == false
    new_post = LeaderboardPost.create(@leaderboard_post)
-  # end
+  end
 
   # Now line up all the leaderboard posts and organize them by milage so we can return a new leaderboard
-  month_names =  ["December", "November", "October", "September", "August", "July", "June", "May", "April", "March", "February", "January"] 
+  month_names =  ["December", "November", "October", "September", "August", "July", "June", "May", "April", "March", "February", "January"]
   years = [2015, 2014, 2013]
   @leaderboard_ranking = []
   years.each do |y|
