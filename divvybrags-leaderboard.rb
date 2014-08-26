@@ -17,6 +17,7 @@ class LeaderboardPost
   property :city, String
   property :month, String
   property :year, Integer
+  property :flag, Boolean
 end
 
 DataMapper.finalize
@@ -131,21 +132,15 @@ end
 
 post '/new_entry' do
     
-  @leaderboard_post = params[:leaderboard_post]
+  @new_post = params[:leaderboard_post]
   
-  # Check to see if anyone has that name in the database already
-  # @already_in_db = false
-  # LeaderboardPost.all.each do |p|
-  #  if p.name == @leaderboard_post[:name]
-  #      @already_in_db = true
-  #      json :status => "name taken"
-  #    end
-  # end
-
-  # If nobody's there with that name, it's a new user!
-  # if @already_in_db == false
-   new_post = LeaderboardPost.create(@leaderboard_post)
-  # end
+  if @new_post.flag == false
+    new_post = LeaderboardPost.create(@leaderboard_post)
+  else
+    post_to_update = LeaderboardPost.first(name: @new_post.name, month: @new_post.month, year: @new_post.year)
+    post_to_update.miles = @new_post.miles
+    post_to_update.save
+  end
 
   # Now line up all the leaderboard posts and organize them by milage so we can return a new leaderboard
   month_names =  ["December", "November", "October", "September", "August", "July", "June", "May", "April", "March", "February", "January"] 
