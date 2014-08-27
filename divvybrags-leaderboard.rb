@@ -63,7 +63,8 @@ get "/entries/:city/:timeperiod/" do          # HTML output for the static site 
         month_html = "<h5>" + m + "</h5><br/>"
         month_posts = @leaderboard.all(month: m, year: y, order: [:miles.desc])
         .group_by { |p| p.name }
-        .map { |key, value| value.max { |b| b.miles } }  # Weeding out duplicates
+        .sort_by { |name, posts| posts.max {|a,b| a.miles } }              # Sort any duplicate legacy posts for highest milage
+        .map { |name,posts| posts[0] }                                     # Select highest milage post, weeding out duplicates
         month_ranking, n = "", 1
         if month_posts.length > 0
           sinatra_html += "<h5>" + m + " " + y.to_s + "</h5><br/>"
@@ -76,11 +77,11 @@ get "/entries/:city/:timeperiod/" do          # HTML output for the static site 
       elsif params[:timeperiod] == "alltime"
         month_posts = @leaderboard.all(month: m, year: y, order: [:miles.desc])
         .group_by { |p| p.name }
-        .map { |key, value| value.max { |b| b.miles } }  # Weeding out duplicates
-        .map { |p| { p.name => p.miles } }
+        .sort_by { |name, posts| posts.max {|a,b| a.miles } }
+        .map { |name,posts| posts[0] }            
         .each do |month_post|
-          name = month_post.keys[0]
-          additional_miles = month_post[name]
+          name = month_post.name
+          additional_miles = month_post.miles
           if alltime_leaderboard.keys.include? name
             alltime_leaderboard[name] += additional_miles
           else
