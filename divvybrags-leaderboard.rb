@@ -65,6 +65,7 @@ get "/entries/:city/:timeperiod/" do          # HTML output for the static site 
         .group_by { |p| p.name }
         .sort_by { |name, posts| posts.max {|a,b| a.miles } }              # Sort any duplicate legacy posts for highest milage
         .map { |name,posts| posts[0] }                                     # Select highest milage post, weeding out duplicates
+        .sort_by { |post| post.miles }.reverse                             # Resort
         month_ranking, n = "", 1
         if month_posts.length > 0
           sinatra_html += "<h5>" + m + " " + y.to_s + "</h5><br/>"
@@ -78,7 +79,8 @@ get "/entries/:city/:timeperiod/" do          # HTML output for the static site 
         month_posts = @leaderboard.all(month: m, year: y, order: [:miles.desc])
         .group_by { |p| p.name }
         .sort_by { |name, posts| posts.max {|a,b| a.miles } }
-        .map { |name,posts| posts[0] }            
+        .map { |name, posts| posts[0] }            
+        .sort_by { |post| post.miles }.reverse                                     
         .each do |month_post|
           name = month_post.name
           additional_miles = month_post.miles
