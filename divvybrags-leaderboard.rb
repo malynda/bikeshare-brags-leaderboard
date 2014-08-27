@@ -62,6 +62,8 @@ get "/entries/:city/:timeperiod/" do          # HTML output for the static site 
       if params[:timeperiod] == "monthly" 
         month_html = "<h5>" + m + "</h5><br/>"
         month_posts = @leaderboard.all(month: m, year: y, order: [:miles.desc])
+        .group_by { |p| p.name }
+        .map { |key, value| value.max { |b| b.miles } }  # Weeding out duplicates
         month_ranking, n = "", 1
         if month_posts.length > 0
           sinatra_html += "<h5>" + m + " " + y.to_s + "</h5><br/>"
@@ -74,7 +76,7 @@ get "/entries/:city/:timeperiod/" do          # HTML output for the static site 
       elsif params[:timeperiod] == "alltime"
         month_posts = @leaderboard.all(month: m, year: y, order: [:miles.desc])
         .group_by { |p| p.name }
-        .map { |key, value| value.max { |b| b.miles } }  # Weeding out any duplicates
+        .map { |key, value| value.max { |b| b.miles } }  # Weeding out duplicates
         .map { |p| { p.name => p.miles } }
         .each do |month_post|
           name = month_post.keys[0]
