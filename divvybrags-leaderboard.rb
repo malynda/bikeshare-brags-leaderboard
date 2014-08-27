@@ -52,17 +52,16 @@ get "/entries/:city/:timeperiod/" do          # HTML output for the static site 
   params[:city] == "NewYork" ? (params_city = "New York") : (params_city = params[:city])
 
   sinatra_html = '<link rel="stylesheet" href="/assets/main.css">'
-
-  @leaderboard = LeaderboardPost.all(:order => [:miles.desc], city: params[:city])
-  @leaderboard_json = []
   month_names =  ["December", "November", "October", "September", "August", "July", "June", "May", "April", "March", "February", "January"] 
   years = [2015, 2014, 2013]
-  @leaderboard_ranking = []
+  @leaderboard = LeaderboardPost.all(:order => [:miles.desc], city: params[:city])
+  alltime_leaderboard, q = {}, 1
+
   years.each do |y|
     month_names.each do |m|
       if params[:timeperiod] == "monthly" 
         month_html = "<h5>" + m + "</h5><br/>"
-        month_posts = LeaderboardPost.all(month: m, year: y, order: [:miles.desc])
+        month_posts = @leaderboard.all(month: m, year: y, order: [:miles.desc])
         month_ranking, n = "", 1
         if month_posts.length > 0
           sinatra_html += "<h5>" + m + " " + y.to_s + "</h5><br/>"
@@ -71,11 +70,30 @@ get "/entries/:city/:timeperiod/" do          # HTML output for the static site 
             n += 1
           end
           sinatra_html += month_ranking
-        end        
+        end
+      elsif params[:timeperiod] == "alltime"
+        month_posts = @leaderboard.all(month: m, year: y, order: [:miles.desc])
+        .group_by { |p| p.name }
+        .map { |key, value| value.max { |b| b.miles } }  # Weeding out any duplicates
+        .map { |p| { p.name => p.miles } }
+        .each do |month_post|
+          name = month_post.keys[0]
+          additional_miles = month_post[name]
+          if alltime_leaderboard.keys.include? name
+            alltime_leaderboard[name] += additional_miles
+          else
+            alltime_leaderboard[name] = additional_miles
+          end
+        end
       end
     end
   end
   
+  alltime_leaderboard.each do |key, value|
+    sinatra_html += "<h10>" + q.to_s + ". " + key.to_s + ": " + value.to_s + "mi</h10><br/>"
+    q += 1
+  end
+
   sinatra_html
 
 end
