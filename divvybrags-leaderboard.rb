@@ -100,13 +100,13 @@ end
 
 post '/new_entry' do
     
-  @new_post = params[:leaderboard_post]
+  new_post = params[:leaderboard_post]
   
-  if @new_post["flag"] == false
-    new_post = LeaderboardPost.create(@leaderboard_post)
+  if new_post["flag"] == false
+    LeaderboardPost.create(new_post)
   else
-    post_to_update = LeaderboardPost.first(name: @new_post.name, month: @new_post.month, year: @new_post.year)
-    post_to_update.miles = @new_post.miles
+    post_to_update = LeaderboardPost.first(name: new_post["name"], month: new_post["month"], year: new_post["year"])
+    post_to_update.miles = new_post["miles"]
     post_to_update.save
   end
 
