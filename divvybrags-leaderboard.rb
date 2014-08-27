@@ -102,7 +102,7 @@ post '/new_entry' do
     
   @new_post = params[:leaderboard_post]
   
-  if @new_post.flag == false
+  if @new_post["flag"] == false
     new_post = LeaderboardPost.create(@leaderboard_post)
   else
     post_to_update = LeaderboardPost.first(name: @new_post.name, month: @new_post.month, year: @new_post.year)
