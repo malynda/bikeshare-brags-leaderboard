@@ -23,28 +23,36 @@ end
 DataMapper.finalize
 DataMapper.auto_upgrade!
 
+def weed_out_duplicates_and_resort(posts)
+  posts.group_by { |p| p.name }
+    .sort_by { |name, posts| posts.max {|a,b| a.miles } }              # Sort any duplicate legacy posts for highest milage
+    .map { |name, posts| posts[0] }                                    # Select highest milage post, weeding out duplicates
+    .sort_by { |post| post.miles }.reverse                             # Resort
+end
+
 get "/entries.json" do            # JSON output for the Chrome extensions to consume
 
-  @leaderboard = LeaderboardPost.all(:order => [:miles.desc], city: params[:city])
-  @leaderboard_json = []
+  leaderboard = LeaderboardPost.all(:order => [:miles.desc], city: params[:city])
+  leaderboard_json = []
   month_names =  ["December", "November", "October", "September", "August", "July", "June", "May", "April", "March", "February", "January"] 
   years = [2015, 2014, 2013]
-  @leaderboard_ranking = []
+  leaderboard_ranking = []
   years.each do |y|
     month_names.each do |m|
-      @month_posts = LeaderboardPost.all(month: m, year: y, order: [:miles.desc])
-      @month_ranking, n = [], 1
-      @month_posts.each do |p|
-        @month_ranking << { n => { name: p.name, miles: p.miles } }
+      month_posts = LeaderboardPost.all(month: m, year: y, order: [:miles.desc])
+      sorted_posts = weed_out_duplicates_and_resort(month_posts)
+      month_ranking, n = [], 1
+      sorted_posts.each do |p|
+        month_ranking << { n => { name: p.name, miles: p.miles } }
         n +=1
       end
-      if @month_ranking.length > 0
-        @leaderboard_json << { "#{m} #{y}" => @month_ranking }
+      if month_ranking.length > 0
+        leaderboard_json << { "#{m} #{y}" => month_ranking }
       end
     end
   end
-  json @leaderboard_json
-
+  json leaderboard_json
+ 
 end
 
 get "/entries/:city/:timeperiod/" do          # HTML output for the static site iframe 
@@ -62,14 +70,11 @@ get "/entries/:city/:timeperiod/" do          # HTML output for the static site 
       if params[:timeperiod] == "monthly" 
         month_html = "<h5>" + m + "</h5><br/>"
         month_posts = @leaderboard.all(month: m, year: y, order: [:miles.desc])
-        .group_by { |p| p.name }
-        .sort_by { |name, posts| posts.max {|a,b| a.miles } }              # Sort any duplicate legacy posts for highest milage
-        .map { |name,posts| posts[0] }                                     # Select highest milage post, weeding out duplicates
-        .sort_by { |post| post.miles }.reverse                             # Resort
+        sorted_posts = weed_out_duplicates_and_resort(month_posts)
         month_ranking, n = "", 1
-        if month_posts.length > 0
+        if sorted_posts.length > 0
           sinatra_html += "<h5>" + m + " " + y.to_s + "</h5><br/>"
-          month_posts.each do |p|
+          sorted_posts.each do |p|
             month_ranking += "<h10>" + n.to_s + ". " + p.name.to_s + ": " + p.miles.to_s + "mi</h10><br/>"
             n += 1
           end
@@ -77,11 +82,8 @@ get "/entries/:city/:timeperiod/" do          # HTML output for the static site 
         end
       elsif params[:timeperiod] == "alltime"
         month_posts = @leaderboard.all(month: m, year: y, order: [:miles.desc])
-        .group_by { |p| p.name }
-        .sort_by { |name, posts| posts.max {|a,b| a.miles } }
-        .map { |name, posts| posts[0] }            
-        .sort_by { |post| post.miles }.reverse                                     
-        .each do |month_post|
+        sorted_posts = weed_out_duplicates_and_resort(month_posts)
+        sorted_posts.each do |month_post|
           name = month_post.name
           additional_miles = month_post.miles
           if alltime_leaderboard.keys.include? name
@@ -118,22 +120,22 @@ post '/new_entry' do
   # Now line up all the leaderboard posts and organize them by milage so we can return a new leaderboard
   month_names =  ["December", "November", "October", "September", "August", "July", "June", "May", "April", "March", "February", "January"] 
   years = [2015, 2014, 2013]
-  @leaderboard_ranking = []
+  leaderboard_ranking = []
   years.each do |y|
     month_names.each do |m|
-      @month_posts = LeaderboardPost.all(month: m, year: y, order: [:miles.desc])
-      @month_ranking, n = [], 1
-      @month_posts.each do |p|
-        @month_ranking << { n => { name: p.name, miles: p.miles } }
+      month_posts = LeaderboardPost.all(month: m, year: y, order: [:miles.desc])
+      sorted_posts = weed_out_duplicates_and_resort(month_posts)
+      month_ranking, n = [], 1
+      sorted_posts.each do |p|
+        month_ranking << { n => { name: p.name, miles: p.miles } }
         n +=1
       end
-      if @month_ranking.length > 0
-        @leaderboard_ranking << { "#{m} #{y}" => @month_ranking }
+      if month_ranking.length > 0
+        leaderboard_ranking << { "#{m} #{y}" => month_ranking }
       end
     end
   end
-  @my_entry = 0
 
-  json :leaderboard => @leaderboard_ranking, :my_entry => @my_entry
+  json :leaderboard => leaderboard_ranking
 
 end
