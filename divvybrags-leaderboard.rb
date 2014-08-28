@@ -30,7 +30,7 @@ def weed_out_duplicates_and_resort(posts)
     .sort_by { |post| post.miles }.reverse                             # Resort
 end
 
-get "/entries.json" do            # JSON output for the Chrome extensions to consume
+def render_leaderboard_json
 
   leaderboard = LeaderboardPost.all(:order => [:miles.desc], city: params[:city])
   leaderboard_json = []
@@ -52,7 +52,11 @@ get "/entries.json" do            # JSON output for the Chrome extensions to con
     end
   end
   json leaderboard_json
- 
+
+end
+
+get "/entries.json" do                        # JSON leaderboard for the Chrome extensions to consume
+  render_leaderboard_json
 end
 
 get "/entries/:city/:timeperiod/" do          # HTML output for the static site iframe 
@@ -116,26 +120,6 @@ post '/new_entry' do
     post_to_update.miles = new_post.miles
     post_to_update.save
   end
-
-  # Now line up all the leaderboard posts and organize them by milage so we can return a new leaderboard
-  month_names =  ["December", "November", "October", "September", "August", "July", "June", "May", "April", "March", "February", "January"] 
-  years = [2015, 2014, 2013]
-  leaderboard_ranking = []
-  years.each do |y|
-    month_names.each do |m|
-      month_posts = LeaderboardPost.all(month: m, year: y, order: [:miles.desc])
-      sorted_posts = weed_out_duplicates_and_resort(month_posts)
-      month_ranking, n = [], 1
-      sorted_posts.each do |p|
-        month_ranking << { n => { name: p.name, miles: p.miles } }
-        n +=1
-      end
-      if month_ranking.length > 0
-        leaderboard_ranking << { "#{m} #{y}" => month_ranking }
-      end
-    end
-  end
-
-  json :leaderboard => leaderboard_ranking
-
+  render_leaderboard_json
+  
 end
