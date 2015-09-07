@@ -93,7 +93,7 @@ post '/new_entry' do
 
   # Now line up all the leaderboard posts and organize them by milage so we can return a new leaderboard
   if @leaderboard_post[:city] == "DC"
-    @new_leaderboard = LeaderboardPost.all(order: [:miles.desc], city: "Chicago")
+    @new_leaderboard = LeaderboardPost.all(order: [:miles.desc], city: "DC")
     @leaderboard_ranking, n = [], 1
     @new_leaderboard.each do |p|
       @leaderboard_ranking << { n => { name: p.name, miles: p.miles } }
