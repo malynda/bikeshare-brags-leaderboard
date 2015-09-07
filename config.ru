@@ -1,2 +1,2 @@
-require './divvybrags-leaderboard'
+require './cabibrags-leaderboard'
 run Sinatra::Application

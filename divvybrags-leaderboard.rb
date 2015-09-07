@@ -15,7 +15,6 @@ class LeaderboardPost
   property :name, String
   property :miles, Integer
   property :city, String
-  property :month, String
   property :year, Integer
   property :flag, Boolean
 end
@@ -34,7 +33,7 @@ def render_leaderboard_json
 
   leaderboard = LeaderboardPost.all(:order => [:miles.desc], city: params[:city])
   leaderboard_json = []
-  month_names =  ["December", "November", "October", "September", "August", "July", "June", "May", "April", "March", "February", "January"] 
+  month_names =  ["December", "November", "October", "September", "August", "July", "June", "May", "April", "March", "February", "January"]
   years = [2015, 2014, 2013]
   leaderboard_ranking = []
   years.each do |y|
@@ -59,19 +58,19 @@ get "/entries.json" do                        # JSON leaderboard for the Chrome 
   render_leaderboard_json
 end
 
-get "/entries/:city/:timeperiod/" do          # HTML output for the static site iframe 
+get "/entries/:city/:timeperiod/" do          # HTML output for the static site iframe
 
   params[:city] == "NewYork" ? (params_city = "New York") : (params_city = params[:city])
 
   sinatra_html = '<link rel="stylesheet" href="/assets/main.css">'
-  month_names =  ["December", "November", "October", "September", "August", "July", "June", "May", "April", "March", "February", "January"] 
+  month_names =  ["December", "November", "October", "September", "August", "July", "June", "May", "April", "March", "February", "January"]
   years = [2015, 2014, 2013]
   @leaderboard = LeaderboardPost.all(:order => [:miles.desc], city: params[:city])
   alltime_leaderboard, q = {}, 1
 
   years.each do |y|
     month_names.each do |m|
-      if params[:timeperiod] == "monthly" 
+      if params[:timeperiod] == "monthly"
         month_html = "<h5>" + m + "</h5><br/>"
         month_posts = @leaderboard.all(month: m, year: y, order: [:miles.desc])
         sorted_posts = weed_out_duplicates_and_resort(month_posts)
@@ -99,7 +98,7 @@ get "/entries/:city/:timeperiod/" do          # HTML output for the static site 
       end
     end
   end
-  
+
   alltime_leaderboard.each do |key, value|
     sinatra_html += "<h10>" + q.to_s + ". " + key.to_s + ": " + value.to_s + "mi</h10><br/>"
     q += 1
@@ -110,9 +109,9 @@ get "/entries/:city/:timeperiod/" do          # HTML output for the static site 
 end
 
 post '/new_entry' do
-    
+
   new_post = LeaderboardPost.new(params[:leaderboard_post])
-  
+
   if new_post.flag == false
     new_post.save
   else
@@ -121,5 +120,5 @@ post '/new_entry' do
     post_to_update.save
   end
   render_leaderboard_json
-  
+
 end
