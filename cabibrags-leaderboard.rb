@@ -14,6 +14,7 @@ class LeaderboardPost
   property :id, Serial
   property :name, String
   property :miles, Integer
+  property :extra_unique_id, Integer, :min => 0, :max => 999999999999
   property :city, String
   property :month, String
   property :year, Integer
@@ -29,10 +30,30 @@ get "/entries.json" do            # JSON output for the Chrome extensions to con
   if params[:city] == "DC"
     @leaderboard_json, n = [], 1
     @leaderboard.each do |p|
-      @leaderboard_json << { n => { :name => p.name, :miles => p.miles } }
+      @leaderboard_json << { n => { :name => p.name, :miles => p.miles, :extra_unique_id => p.extra_unique_id } }
       n += 1
     end
     json @leaderboard_json
+  elsif params[:city] == "New York"
+    @leaderboard_json = []
+    month_names =  ["December", "November", "October", "September", "August", "July", "June", "May", "April", "March", "February", "January"]
+    years = [2015, 2014, 2013]
+    @leaderboard_ranking = []
+    years.each do |y|
+      month_names.each do |m|
+        @month_posts = LeaderboardPost.all(month: m, year: y, order: [:miles.desc])
+        @month_ranking, n = [], 1
+        @month_posts.each do |p|
+          @month_ranking << { n => { name: p.name, miles: p.miles } }
+          n +=1
+        end
+        if @month_ranking.length > 0
+          @leaderboard_json << { "#{m} #{y}" => @month_ranking }
+        end
+      end
+    end
+    json @leaderboard_json
+  end
 end
 
 get "/entries/:city/" do          # HTML output for the static site iframe
@@ -72,7 +93,7 @@ post '/new_entry' do
 
   # Now line up all the leaderboard posts and organize them by milage so we can return a new leaderboard
   if @leaderboard_post[:city] == "DC"
-    @new_leaderboard = LeaderboardPost.all(order: [:miles.desc], city: "DC")
+    @new_leaderboard = LeaderboardPost.all(order: [:miles.desc], city: "Chicago")
     @leaderboard_ranking, n = [], 1
     @new_leaderboard.each do |p|
       @leaderboard_ranking << { n => { name: p.name, miles: p.miles } }
@@ -82,8 +103,26 @@ post '/new_entry' do
     @leaderboard_ranking.each do |p|
       if p[p.keys[0]][:name].strip.upcase == @leaderboard_post[:name].strip.upcase then @my_entry = p end
     end
-
+  else
+    month_names =  ["December", "November", "October", "September", "August", "July", "June", "May", "April", "March", "February", "January"]
+    years = [2015, 2014, 2013]
+    @leaderboard_ranking = []
+    years.each do |y|
+      month_names.each do |m|
+        @month_posts = LeaderboardPost.all(month: m, year: y, order: [:miles.desc])
+        @month_ranking, n = [], 1
+        @month_posts.each do |p|
+          @month_ranking << { n => { name: p.name, miles: p.miles } }
+          n +=1
+        end
+        if @month_ranking.length > 0
+          @leaderboard_ranking << { "#{m} #{y}" => @month_ranking }
+        end
+      end
+    end
+    @my_entry = 0
   end
+
   json :leaderboard => @leaderboard_ranking, :my_entry => @my_entry
 
 end
