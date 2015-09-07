@@ -7,7 +7,7 @@ require "sinatra/json"
 
 disable :protection             # This was messing with the iframing
 
-DataMapper.setup(:default, ENV['HEROKU_POSTGRESQL_TEAL_URL'] || 'postgres://localhost/leaderboard')
+DataMapper.setup(:default, ENV['HEROKU_POSTGRESQL_PURPLE_URL'] || 'postgres://localhost/leaderboard')
 
 class LeaderboardPost
   include DataMapper::Resource
