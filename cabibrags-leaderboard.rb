@@ -83,6 +83,7 @@ post '/new_entry' do
       if p[p.keys[0]][:name].strip.upcase == @leaderboard_post[:name].strip.upcase then @my_entry = p end
     end
 
+  end
   json :leaderboard => @leaderboard_ranking, :my_entry => @my_entry
 
 end
