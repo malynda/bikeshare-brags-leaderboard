@@ -143,8 +143,8 @@ def render_leaderboard_json
 
   leaderboard = LeaderboardPost.all(:order => [:miles.desc], city: params[:city])
   leaderboard_json = []
-  month_names =  ["December", "November", "October", "September", "August", "July", "June", "May", "April", "March", "February", "January"]
-  years = [2015, 2014, 2013]
+  # month_names =  ["December", "November", "October", "September", "August", "July", "June", "May", "April", "March", "February", "January"]
+  # years = [2015, 2014, 2013]
   leaderboard_ranking = []
   years.each do |y|
     month_names.each do |m|
@@ -162,4 +162,11 @@ def render_leaderboard_json
   end
   json leaderboard_json
 
+end
+
+def weed_out_duplicates_and_resort(posts)
+  posts.group_by { |p| p.name }
+    .sort_by { |name, posts| posts.max {|a,b| a.miles } }              # Sort any duplicate legacy posts for highest milage
+    .map { |name, posts| posts[0] }                                    # Select highest milage post, weeding out duplicates
+    .sort_by { |post| post.miles }.reverse                             # Resort
 end
