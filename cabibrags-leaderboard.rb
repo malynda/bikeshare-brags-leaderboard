@@ -30,7 +30,7 @@ get "/entries.json" do            # JSON output for the Chrome extensions to con
   if params[:city] == "DC"
     @leaderboard_json, n = [], 1
     @leaderboard.each do |p|
-      @leaderboard_json << { n => { :name => p.name, :miles => p.miles, :extra_unique_id => p.extra_unique_id } }
+      @leaderboard_json << { n => { :name => p.name, :miles => p.miles} }
       n += 1
     end
     json @leaderboard_json
@@ -136,5 +136,30 @@ post '/new_entry' do
   # end
   #
   # json :leaderboard => @leaderboard_ranking, :my_entry => @my_entry
+
+end
+
+def render_leaderboard_json
+
+  leaderboard = LeaderboardPost.all(:order => [:miles.desc], city: params[:city])
+  leaderboard_json = []
+  month_names =  ["December", "November", "October", "September", "August", "July", "June", "May", "April", "March", "February", "January"]
+  years = [2015, 2014, 2013]
+  leaderboard_ranking = []
+  years.each do |y|
+    month_names.each do |m|
+      month_posts = LeaderboardPost.all(month: m, year: y, order: [:miles.desc])
+      sorted_posts = weed_out_duplicates_and_resort(month_posts)
+      month_ranking, n = [], 1
+      sorted_posts.each do |p|
+        month_ranking << { n => { name: p.name, miles: p.miles } }
+        n +=1
+      end
+      if month_ranking.length > 0
+        leaderboard_json << { "#{m} #{y}" => month_ranking }
+      end
+    end
+  end
+  json leaderboard_json
 
 end
