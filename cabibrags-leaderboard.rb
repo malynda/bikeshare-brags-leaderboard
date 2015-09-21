@@ -14,7 +14,7 @@ class LeaderboardPost
   property :id, Serial
   property :name, String
   property :miles, Integer
-  # property :city, String
+  property :city, String
   # property :year, Integer
   property :flag, Boolean
 end
