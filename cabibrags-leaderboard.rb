@@ -146,20 +146,21 @@ def render_leaderboard_json
   # month_names =  ["December", "November", "October", "September", "August", "July", "June", "May", "April", "March", "February", "January"]
   # years = [2015, 2014, 2013]
   leaderboard_ranking = []
-  years.each do |y|
-    month_names.each do |m|
-      month_posts = LeaderboardPost.all(month: m, year: y, order: [:miles.desc])
-      sorted_posts = weed_out_duplicates_and_resort(month_posts)
-      month_ranking, n = [], 1
-      sorted_posts.each do |p|
-        month_ranking << { n => { name: p.name, miles: p.miles } }
-        n +=1
-      end
-      if month_ranking.length > 0
-        leaderboard_json << { "#{m} #{y}" => month_ranking }
-      end
-    end
-  end
+  # years.each do |y|
+  #   month_names.each do |m|
+  #     month_posts = LeaderboardPost.all(month: m, year: y, order: [:miles.desc])
+  #     sorted_posts = weed_out_duplicates_and_resort(month_posts)
+  #     month_ranking, n = [], 1
+  #     sorted_posts.each do |p|
+  #       month_ranking << { n => { name: p.name, miles: p.miles } }
+  #       n +=1
+  #     end
+  #     if month_ranking.length > 0
+  #       leaderboard_json << { "#{m} #{y}" => month_ranking }
+  #     end
+  #   end
+  # end
+  leaderboard_json << { n => { name: p.name, miles: p.miles } }
   json leaderboard_json
 
 end
