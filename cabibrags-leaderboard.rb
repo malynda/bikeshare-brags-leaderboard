@@ -72,57 +72,69 @@ end
 
 post '/new_entry' do
 
-  @leaderboard_post = params[:leaderboard_post]
+  new_post = LeaderboardPost.new(params[:leaderboard_post])
 
-  # Check to see if anyone has that extra unique ID in the database already
-  @already_in_db = false
-  LeaderboardPost.all.each do |p|
-    if p.extra_unique_id == @leaderboard_post[:extra_unique_id].to_i
-      p.miles = @leaderboard_post[:miles]
-      if p.save
-        @already_in_db = true
-      end
-    end
-  end
-
-  # If nobody's there with that extra unique id, then we know it's a new user!
-  if @already_in_db == false
-    new_post = LeaderboardPost.create(@leaderboard_post)
+  if new_post.flag == false
     new_post.save
+  else
+    post_to_update = LeaderboardPost.first(name: new_post.name)
+    post_to_update.miles = new_post.miles
+    post_to_update.save
   end
+  render_leaderboard_json
+
+####################################
+  # @leaderboard_post = params[:leaderboard_post]
+  #
+  # # Check to see if anyone has that extra unique ID in the database already
+  # @already_in_db = false
+  # LeaderboardPost.all.each do |p|
+  #   if p.extra_unique_id == @leaderboard_post[:extra_unique_id].to_i
+  #     p.miles = @leaderboard_post[:miles]
+  #     if p.save
+  #       @already_in_db = true
+  #     end
+  #   end
+  # end
+  #
+  # # If nobody's there with that extra unique id, then we know it's a new user!
+  # if @already_in_db == false
+  #   new_post = LeaderboardPost.create(@leaderboard_post)
+  #   new_post.save
+  # end
 
   # Now line up all the leaderboard posts and organize them by milage so we can return a new leaderboard
-  if @leaderboard_post[:city] == "DC"
-    @new_leaderboard = LeaderboardPost.all(order: [:miles.desc], city: "DC")
-    @leaderboard_ranking, n = [], 1
-    @new_leaderboard.each do |p|
-      @leaderboard_ranking << { n => { name: p.name, miles: p.miles } }
-      n += 1
-    end
-    # Pull out the leaderboard entry that's just been submitted as special
-    @leaderboard_ranking.each do |p|
-      if p[p.keys[0]][:name].strip.upcase == @leaderboard_post[:name].strip.upcase then @my_entry = p end
-    end
-  else
-    month_names =  ["December", "November", "October", "September", "August", "July", "June", "May", "April", "March", "February", "January"]
-    years = [2015, 2014, 2013]
-    @leaderboard_ranking = []
-    years.each do |y|
-      month_names.each do |m|
-        @month_posts = LeaderboardPost.all(month: m, year: y, order: [:miles.desc])
-        @month_ranking, n = [], 1
-        @month_posts.each do |p|
-          @month_ranking << { n => { name: p.name, miles: p.miles } }
-          n +=1
-        end
-        if @month_ranking.length > 0
-          @leaderboard_ranking << { "#{m} #{y}" => @month_ranking }
-        end
-      end
-    end
-    @my_entry = 0
-  end
-
-  json :leaderboard => @leaderboard_ranking, :my_entry => @my_entry
+  # if @leaderboard_post[:city] == "DC"
+  #   @new_leaderboard = LeaderboardPost.all(order: [:miles.desc], city: "DC")
+  #   @leaderboard_ranking, n = [], 1
+  #   @new_leaderboard.each do |p|
+  #     @leaderboard_ranking << { n => { name: p.name, miles: p.miles } }
+  #     n += 1
+  #   end
+  #   # Pull out the leaderboard entry that's just been submitted as special
+  #   @leaderboard_ranking.each do |p|
+  #     if p[p.keys[0]][:name].strip.upcase == @leaderboard_post[:name].strip.upcase then @my_entry = p end
+  #   end
+  # else
+  #   month_names =  ["December", "November", "October", "September", "August", "July", "June", "May", "April", "March", "February", "January"]
+  #   years = [2015, 2014, 2013]
+  #   @leaderboard_ranking = []
+  #   years.each do |y|
+  #     month_names.each do |m|
+  #       @month_posts = LeaderboardPost.all(month: m, year: y, order: [:miles.desc])
+  #       @month_ranking, n = [], 1
+  #       @month_posts.each do |p|
+  #         @month_ranking << { n => { name: p.name, miles: p.miles } }
+  #         n +=1
+  #       end
+  #       if @month_ranking.length > 0
+  #         @leaderboard_ranking << { "#{m} #{y}" => @month_ranking }
+  #       end
+  #     end
+  #   end
+  #   @my_entry = 0
+  # end
+  #
+  # json :leaderboard => @leaderboard_ranking, :my_entry => @my_entry
 
 end
