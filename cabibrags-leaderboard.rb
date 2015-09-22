@@ -33,26 +33,26 @@ get "/entries.json" do            # JSON output for the Chrome extensions to con
       n += 1
     end
     json @leaderboard_json
-  elsif params[:city] == "New York"
-    @leaderboard_json = []
-    month_names =  ["December", "November", "October", "September", "August", "July", "June", "May", "April", "March", "February", "January"]
-    years = [2015, 2014, 2013]
-    @leaderboard_ranking = []
-    years.each do |y|
-      month_names.each do |m|
-        @month_posts = LeaderboardPost.all(month: m, year: y, order: [:miles.desc])
-        @month_ranking, n = [], 1
-        @month_posts.each do |p|
-          @month_ranking << { n => { name: p.name, miles: p.miles } }
-          n +=1
-        end
-        if @month_ranking.length > 0
-          @leaderboard_json << { "#{m} #{y}" => @month_ranking }
-        end
-      end
-    end
-    json @leaderboard_json
-  end
+  # elsif params[:city] == "New York"
+  #   @leaderboard_json = []
+  #   month_names =  ["December", "November", "October", "September", "August", "July", "June", "May", "April", "March", "February", "January"]
+  #   years = [2015, 2014, 2013]
+  #   @leaderboard_ranking = []
+  #   years.each do |y|
+  #     month_names.each do |m|
+  #       @month_posts = LeaderboardPost.all(month: m, year: y, order: [:miles.desc])
+  #       @month_ranking, n = [], 1
+  #       @month_posts.each do |p|
+  #         @month_ranking << { n => { name: p.name, miles: p.miles } }
+  #         n +=1
+  #       end
+  #       if @month_ranking.length > 0
+  #         @leaderboard_json << { "#{m} #{y}" => @month_ranking }
+  #       end
+  #     end
+  #   end
+  #   json @leaderboard_json
+  # end
 end
 
 get "/entries/:city/" do          # HTML output for the static site iframe
@@ -144,7 +144,7 @@ def render_leaderboard_json
   leaderboard_json = []
   # month_names =  ["December", "November", "October", "September", "August", "July", "June", "May", "April", "March", "February", "January"]
   # years = [2015, 2014, 2013]
-  leaderboard_ranking = []
+  # leaderboard_ranking = []
   # years.each do |y|
   #   month_names.each do |m|
   #     month_posts = LeaderboardPost.all(month: m, year: y, order: [:miles.desc])
@@ -165,8 +165,8 @@ def render_leaderboard_json
     leaderboard_json << { n => { name: p.name, miles: p.miles } }
     n += 1
   end
-  json leaderboard_json
-
+  # json leaderboard_json
+  json leaderboard
 end
 
 def weed_out_duplicates_and_resort(posts)
