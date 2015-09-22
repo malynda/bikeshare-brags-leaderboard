@@ -166,7 +166,7 @@ def render_leaderboard_json
     n += 1
   end
   # json leaderboard_json
-  json the_posts
+  json leaderboard_json
 end
 
 def weed_out_duplicates_and_resort(posts)
