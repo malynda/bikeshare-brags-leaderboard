@@ -42,7 +42,7 @@ def render_leaderboard_json
       n += 1
     end
 
-    json leaderboard_json
+    json @leaderboard_json
   end
   #json the_posts
 end
