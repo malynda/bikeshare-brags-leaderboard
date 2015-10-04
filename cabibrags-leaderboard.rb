@@ -22,6 +22,7 @@ DataMapper.finalize
 DataMapper.auto_upgrade!
 
 
+
 def weed_out_duplicates_and_resort(posts)
   posts.group_by { |p| p.name }
     .sort_by { |name, posts| posts.max {|a,b| a.miles } }              # Sort any duplicate legacy posts for highest milage
@@ -72,6 +73,7 @@ get "/entries.json" do            # JSON output for the Chrome extensions to con
       n += 1
     end
     json @leaderboard_json
+  end
   # elsif params[:city] == "New York"
   #   @leaderboard_json = []
   #   month_names =  ["December", "November", "October", "September", "August", "July", "June", "May", "April", "March", "February", "January"]
