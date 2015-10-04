@@ -21,6 +21,15 @@ end
 DataMapper.finalize
 DataMapper.auto_upgrade!
 
+
+def weed_out_duplicates_and_resort(posts)
+  posts.group_by { |p| p.name }
+    .sort_by { |name, posts| posts.max {|a,b| a.miles } }              # Sort any duplicate legacy posts for highest milage
+    .map { |name, posts| posts[0] }                                    # Select highest milage post, weeding out duplicates
+    .sort_by { |post| post.miles }.reverse                             # Resort
+end
+
+
 def render_leaderboard_json
 
   leaderboard = LeaderboardPost.all(:order => [:miles.desc], city: params[:city])
@@ -50,13 +59,6 @@ def render_leaderboard_json
   end
   # json leaderboard_json
   json the_posts
-end
-
-def weed_out_duplicates_and_resort(posts)
-  posts.group_by { |p| p.name }
-    .sort_by { |name, posts| posts.max {|a,b| a.miles } }              # Sort any duplicate legacy posts for highest milage
-    .map { |name, posts| posts[0] }                                    # Select highest milage post, weeding out duplicates
-    .sort_by { |post| post.miles }.reverse                             # Resort
 end
 
 get "/entries.json" do            # JSON output for the Chrome extensions to consume
@@ -172,3 +174,5 @@ end
   # end
   #
   # json :leaderboard => @leaderboard_ranking, :my_entry => @my_entry
+
+end
