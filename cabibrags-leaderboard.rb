@@ -21,6 +21,44 @@ end
 DataMapper.finalize
 DataMapper.auto_upgrade!
 
+def render_leaderboard_json
+
+  leaderboard = LeaderboardPost.all(:order => [:miles.desc], city: params[:city])
+  leaderboard_json = []
+  # month_names =  ["December", "November", "October", "September", "August", "July", "June", "May", "April", "March", "February", "January"]
+  # years = [2015, 2014, 2013]
+  # leaderboard_ranking = []
+  # years.each do |y|
+  #   month_names.each do |m|
+  #     month_posts = LeaderboardPost.all(month: m, year: y, order: [:miles.desc])
+  #     sorted_posts = weed_out_duplicates_and_resort(month_posts)
+  #     month_ranking, n = [], 1
+  #     sorted_posts.each do |p|
+  #       month_ranking << { n => { name: p.name, miles: p.miles } }
+  #       n +=1
+  #     end
+  #     if month_ranking.length > 0
+  #       leaderboard_json << { "#{m} #{y}" => month_ranking }
+  #     end
+  #   end
+  # end
+  the_posts = weed_out_duplicates_and_resort(leaderboard)
+  n = 1
+  the_posts.each do |p|
+    leaderboard_json << { n => { name: p.name, miles: p.miles } }
+    n += 1
+  end
+  # json leaderboard_json
+  json the_posts
+end
+
+def weed_out_duplicates_and_resort(posts)
+  posts.group_by { |p| p.name }
+    .sort_by { |name, posts| posts.max {|a,b| a.miles } }              # Sort any duplicate legacy posts for highest milage
+    .map { |name, posts| posts[0] }                                    # Select highest milage post, weeding out duplicates
+    .sort_by { |post| post.miles }.reverse                             # Resort
+end
+
 get "/entries.json" do            # JSON output for the Chrome extensions to consume
 
   @leaderboard = LeaderboardPost.all(:order => [:miles.desc], city: params[:city])
@@ -80,7 +118,7 @@ post '/new_entry' do
     post_to_update.save
   end
   render_leaderboard_json
-
+end
 ####################################
   # @leaderboard_post = params[:leaderboard_post]
   #
@@ -134,43 +172,3 @@ post '/new_entry' do
   # end
   #
   # json :leaderboard => @leaderboard_ranking, :my_entry => @my_entry
-
-end
-
-def render_leaderboard_json
-
-  leaderboard = LeaderboardPost.all(:order => [:miles.desc], city: params[:city])
-  leaderboard_json = []
-  # month_names =  ["December", "November", "October", "September", "August", "July", "June", "May", "April", "March", "February", "January"]
-  # years = [2015, 2014, 2013]
-  # leaderboard_ranking = []
-  # years.each do |y|
-  #   month_names.each do |m|
-  #     month_posts = LeaderboardPost.all(month: m, year: y, order: [:miles.desc])
-  #     sorted_posts = weed_out_duplicates_and_resort(month_posts)
-  #     month_ranking, n = [], 1
-  #     sorted_posts.each do |p|
-  #       month_ranking << { n => { name: p.name, miles: p.miles } }
-  #       n +=1
-  #     end
-  #     if month_ranking.length > 0
-  #       leaderboard_json << { "#{m} #{y}" => month_ranking }
-  #     end
-  #   end
-  # end
-  the_posts = weed_out_duplicates_and_resort(leaderboard)
-  n = 1
-  the_posts.each do |p|
-    leaderboard_json << { n => { name: p.name, miles: p.miles } }
-    n += 1
-  end
-  # json leaderboard_json
-  json the_posts
-end
-
-def weed_out_duplicates_and_resort(posts)
-  posts.group_by { |p| p.name }
-    .sort_by { |name, posts| posts.max {|a,b| a.miles } }              # Sort any duplicate legacy posts for highest milage
-    .map { |name, posts| posts[0] }                                    # Select highest milage post, weeding out duplicates
-    .sort_by { |post| post.miles }.reverse                             # Resort
-end
