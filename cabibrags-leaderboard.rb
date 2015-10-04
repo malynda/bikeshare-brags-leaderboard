@@ -74,6 +74,7 @@ get "/entries.json" do            # JSON output for the Chrome extensions to con
     end
     json @leaderboard_json
   end
+end
   # elsif params[:city] == "New York"
   #   @leaderboard_json = []
   #   month_names =  ["December", "November", "October", "September", "August", "July", "June", "May", "April", "March", "February", "January"]
@@ -94,7 +95,7 @@ get "/entries.json" do            # JSON output for the Chrome extensions to con
   #   end
   #   json @leaderboard_json
   # end
-end
+# end
 
 get "/entries/:city/" do          # HTML output for the static site iframe
 
@@ -177,4 +178,4 @@ end
   #
   # json :leaderboard => @leaderboard_ranking, :my_entry => @my_entry
 
-end
+# end
