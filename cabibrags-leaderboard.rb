@@ -41,7 +41,7 @@ def render_leaderboard_json
     leaderboard_json << { n => { name: p.name, miles: p.miles } }
     n += 1
   end
-   json leaderboard_json
+   json @leaderboard_json
   #json the_posts
 end
 
