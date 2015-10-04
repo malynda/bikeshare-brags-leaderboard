@@ -34,17 +34,13 @@ end
 def render_leaderboard_json
 
   @leaderboard = LeaderboardPost.all(:order => [:miles.desc], city: params[:city])
-  if params[:city] == "DC"
-    @leaderboard_json, n = [], 1
-    @the_posts = weed_out_duplicates_and_resort(@leaderboard)
-    @the_posts.each do |p|
-      @leaderboard_json << { n => { name: p.name, miles: p.miles } }
-      n += 1
-    end
-
-    json @leaderboard_json
+  @leaderboard_json, n = [], 1
+  @the_posts = weed_out_duplicates_and_resort(@leaderboard)
+  @the_posts.each do |p|
+    @leaderboard_json << { n => { name: p.name, miles: p.miles } }
+    n += 1
   end
-  #json the_posts
+  json @leaderboard_json
 end
 
 get "/entries.json" do            # JSON output for the Chrome extensions to consume
