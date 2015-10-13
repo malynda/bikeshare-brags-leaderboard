@@ -21,8 +21,6 @@ end
 DataMapper.finalize
 DataMapper.auto_upgrade!
 
-
-
 def weed_out_duplicates_and_resort(posts)
   posts.group_by { |p| p.name }
     .sort_by { |name, posts| posts.max {|a,b| a.miles } }              # Sort any duplicate legacy posts for highest milage
@@ -30,10 +28,9 @@ def weed_out_duplicates_and_resort(posts)
     .sort_by { |post| post.miles }.reverse                             # Resort
 end
 
-
 def render_leaderboard_json
-
-  leaderboard = LeaderboardPost.all(:order => [:miles.desc], city: params[:city])
+  @leaderboard = LeaderboardPost.all(:order => [:miles.desc], city: params[:city])
+  print @leaderboard
   leaderboard_json, n = [], 1
   the_posts = weed_out_duplicates_and_resort(leaderboard)
   the_posts.each do |p|
