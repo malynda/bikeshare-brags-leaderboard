@@ -21,8 +21,8 @@ end
 DataMapper.finalize
 DataMapper.auto_upgrade!
 
-def weed_out_duplicates_and_resort(@posts)
-  @posts.group_by { |p| p.name }
+def weed_out_duplicates_and_resort(posts)
+  posts.group_by { |p| p.name }
     .sort_by { |name, posts| posts.max {|a,b| a.miles } }              # Sort any duplicate legacy posts for highest milage
     .map { |name, posts| posts[0] }                                    # Select highest milage post, weeding out duplicates
     .sort_by { |post| post.miles }.reverse                             # Resort
