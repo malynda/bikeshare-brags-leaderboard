@@ -37,7 +37,7 @@ def render_leaderboard_json
     @leaderboard_json << { n => { name: p.name, miles: p.miles } }
     n += 1
   end
-  @json leaderboard_json
+  json @leaderboard_json
 end
 
 get "/entries.json" do            # JSON output for the Chrome extensions to consume
