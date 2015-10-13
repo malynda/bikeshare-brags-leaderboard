@@ -30,10 +30,10 @@ end
 
 def render_leaderboard_json
   @leaderboard = LeaderboardPost.all(:order => [:miles.desc], city: params[:city])
-  print @leaderboard
+  # print @leaderboard
   @leaderboard_json, n = [], 1
-  @the_posts = weed_out_duplicates_and_resort(@leaderboard)
-  @the_posts.each do |p|
+  # @the_posts = weed_out_duplicates_and_resort(@leaderboard)
+  @leaderboard.each do |p|
     @leaderboard_json << { n => { name: p.name, miles: p.miles } }
     n += 1
   end
