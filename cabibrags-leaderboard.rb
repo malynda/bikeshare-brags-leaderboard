@@ -73,7 +73,7 @@ post '/new_entry' do
 
   new_post = LeaderboardPost.new(params[:leaderboard_post])
 
-  if new_post.flag == true
+  if new_post.flag == false
     new_post.save
   else
     post_to_update = LeaderboardPost.first(name: new_post.name)
