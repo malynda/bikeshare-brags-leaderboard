@@ -33,7 +33,7 @@ def render_leaderboard_json
   # print @leaderboard
   @leaderboard_json, n = [], 1
   @the_posts = weed_out_duplicates_and_resort(*@leaderboard)
-  @leaderboard.each do |p|
+  @the_posts.each do |p|
     @leaderboard_json << { n => { name: p.name, miles: p.miles } }
     n += 1
   end
