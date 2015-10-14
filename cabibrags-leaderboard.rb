@@ -46,7 +46,8 @@ get "/entries.json" do            # JSON output for the Chrome extensions to con
 
   if params[:city] == "DC"
     @leaderboard_json, n = [], 1
-    @leaderboard.each do |p|
+    @the_posts = weed_out_duplicates_and_resort(*@leaderboard)
+    @the_posts.each do |p|
       @leaderboard_json << { n => { :name => p.name, :miles => p.miles} }
       n += 1
     end
@@ -60,7 +61,8 @@ get "/entries/:city/" do          # HTML output for the static site iframe
   @leaderboard = LeaderboardPost.all(order: [:miles.desc], city: params[:city])  # Return leaderboard for the right city
   n = 1
   sinatra_html = '<link rel="stylesheet" href="/assets/main.css">'
-  @leaderboard.each do |p|
+  @the_posts = weed_out_duplicates_and_resort(*@leaderboard)
+  @the_posts.each do |p|
     post_html = n.to_s + ". " + p.name + ": " + p.miles.to_s + "mi<br>"
     sinatra_html += post_html
     n += 1
