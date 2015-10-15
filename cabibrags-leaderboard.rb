@@ -29,7 +29,7 @@ def weed_out_duplicates_and_resort(*posts)
 end
 
 def render_leaderboard_json
-  @leaderboard = LeaderboardPost.all(:order => [:miles.desc], city: params[:city])
+  @leaderboard = LeaderboardPost.all(:order => [:miles.desc], city: DC)
   # print @leaderboard
   @leaderboard_json, n = [], 1
   @the_posts = weed_out_duplicates_and_resort(*@leaderboard)
@@ -59,7 +59,7 @@ end
 
 get "/entries/:city/" do          # HTML output for the static site iframe
 
-  @leaderboard = LeaderboardPost.all(order: [:miles.desc], city: params[:city])  # Return leaderboard for the right city
+  @leaderboard = LeaderboardPost.all(order: [:miles.desc], city: DC)  # Return leaderboard for the right city
   n = 1
   sinatra_html = '<link rel="stylesheet" href="/assets/main.css">'
   @the_posts = weed_out_duplicates_and_resort(*@leaderboard)
