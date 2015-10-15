@@ -21,7 +21,7 @@ end
 DataMapper.finalize
 DataMapper.auto_upgrade!
 
-def weed_out_duplicates_and_resort(*posts)
+def weed_out_duplicates_and_resort(posts)
   posts.group_by { |p| p.name }
     .sort_by { |name, posts| posts.max {|a,b| a.miles } }              # Sort any duplicate legacy posts for highest milage
     .map { |name, posts| posts[0] }                                    # Select highest milage post, weeding out duplicates
@@ -29,12 +29,12 @@ def weed_out_duplicates_and_resort(*posts)
 end
 
 def render_leaderboard_json
-  @leaderboard = LeaderboardPost.all(:order => [:miles.desc], city: params[:city])
+  leaderboard = LeaderboardPost.all(:order => [:miles.desc], city: params[:city])
   # print @leaderboard
-  @leaderboard_json, n = [], 1
-  @the_posts = weed_out_duplicates_and_resort(*@leaderboard)
-  @the_posts.each do |p|
-    @leaderboard_json << { n => { name: p.name, miles: p.miles } }
+  leaderboard_json, n = [], 1
+  the_posts = weed_out_duplicates_and_resort(leaderboard)
+  the_posts.each do |p|
+    leaderboard_json << { n => { name: p.name, miles: p.miles } }
     n += 1
   end
   json @leaderboard_json
@@ -71,7 +71,7 @@ get "/entries/:city/" do          # HTML output for the static site iframe
 
 end
 
-post '/new_entry' do
+post "/new_entry" do
 
   new_post = LeaderboardPost.new(params[:leaderboard_post])
 
