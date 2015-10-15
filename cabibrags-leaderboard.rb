@@ -42,7 +42,7 @@ end
 
 get "/entries.json" do            # JSON output for the Chrome extensions to consume
 
-  @leaderboard = LeaderboardPost.all(:order => [:miles.desc], city: params[:city])
+  # @leaderboard = LeaderboardPost.all(:order => [:miles.desc], city: params[:city])
 
   if params[:city] == "DC"
     # @leaderboard_json, n = [], 1
